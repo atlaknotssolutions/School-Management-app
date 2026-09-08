@@ -17,7 +17,7 @@ export default function PlatformTabsLayout() {
       backBehavior="history"
     >
 
-         {/* <Tabs.Screen
+        <Tabs.Screen
         name="platform"
         options={{
           title: "Platform Management",
@@ -25,7 +25,7 @@ export default function PlatformTabsLayout() {
             <Ionicons name="school-outline" size={size} color={color} />
           ),
         }}
-      /> */}
+      />
       <Tabs.Screen
         name="schools"
         options={{
@@ -62,6 +62,7 @@ export default function PlatformTabsLayout() {
           ),
         }}
       />
+    
     </Tabs>
   );
 }
