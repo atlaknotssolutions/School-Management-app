@@ -1,6 +1,6 @@
+import Sidebar from "@/components/Sidebar";
 import { Drawer } from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Sidebar from "@/components/Sidebar";
 
 export default function DrawerLayout() {
   return (
@@ -23,6 +23,13 @@ export default function DrawerLayout() {
           options={{
             title: "Dashboard",
             drawerLabel: "Dashboard",
+          }}
+        />
+        <Drawer.Screen
+          name="platform-dashboard"
+          options={{
+            title: "Platform Dashboard",
+            drawerLabel: "Platform Dashboard",
           }}
         />
         {/* Baaki screens baad mein add kar dena */}
