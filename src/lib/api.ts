@@ -572,6 +572,7 @@ async function request(path: string, options: any = {}) {
 export const api = {
   login: (credentials: any) =>
     request("/auth/login", json("POST", credentials)),
+  register: (payload: any) => request("/auth/register", json("POST", payload)),
   me: () => request("/auth/me"),
 
   users: {

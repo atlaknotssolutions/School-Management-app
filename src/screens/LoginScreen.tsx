@@ -22,8 +22,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { api } from "../lib/api";
 import { saveSession } from "../lib/storage";
+import { setCredentials } from "../store/authSlice";
 
 // Types
 type Role = "parent" | "student" | "teacher" | "admin";
@@ -49,6 +51,7 @@ const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
@@ -110,11 +113,10 @@ export default function LoginScreen() {
         const { data } = await api.login({ email: trimmedEmail, password });
 
         await saveSession(data); // aapka existing function
+        dispatch(setCredentials(data));
 
         router.replace(
-          data.user?.role === "super_admin"
-            ? "/(drawer)/platform-dashboard"
-            : "/",
+          (data.user?.role === "super_admin" ? "/platform/(tabs)" : "/") as any,
         );
       }
     } catch (requestError: any) {
@@ -142,7 +144,6 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Left side branding */}
         <View style={styles.brandHeader}>
           <View style={styles.logoRow}>
             <View style={styles.logoBox}>
