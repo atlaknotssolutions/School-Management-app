@@ -1,0 +1,64 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ArrowUpRight, CalendarCheck, ChevronRight, IndianRupee, Megaphone, UserPlus, Users } from "lucide-react-native";
+import Topbar from "@/components/Topbar";
+import { api } from "@/lib/api";
+
+const colors = { ink: "#16213E", amber: "#E8A33D", paper: "#F7F8FA", slate: "#667085", border: "#E7E9EE", green: "#3F8F5F", blue: "#3B6FA0", red: "#D65A4A" };
+
+type DashboardData = { studentStats: { total: number; active: number; byClass?: any[] }; students: any[]; attendance: any[]; invoices: any[]; payments: any[]; admissions: any[]; notices: any[] };
+const emptyData: DashboardData = { studentStats: { total: 0, active: 0, byClass: [] }, students: [], attendance: [], invoices: [], payments: [], admissions: [], notices: [] };
+const money = (value: number) => `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+
+function Card({ title, children, action }: { title: string; children: React.ReactNode; action?: string }) {
+  return <View style={styles.card}><View style={styles.cardHeader}><Text style={styles.cardTitle}>{title}</Text>{action ? <TouchableOpacity style={styles.action}><Text style={styles.actionText}>{action}</Text><ChevronRight size={14} color={colors.blue} /></TouchableOpacity> : null}</View>{children}</View>;
+}
+
+function StatCard({ icon: Icon, label, value, detail, tint }: { icon: React.ComponentType<any>; label: string; value: string; detail: string; tint: string }) {
+  return <View style={styles.statCard}><View style={[styles.statIcon, { backgroundColor: `${tint}18` }]}><Icon size={18} color={tint} /></View><Text style={styles.statLabel}>{label}</Text><Text style={styles.statValue}>{value}</Text><Text style={styles.statDetail}>{detail}</Text></View>;
+}
+
+export default function Dashboard() {
+  const [data, setData] = useState<DashboardData>(emptyData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadDashboard = async () => {
+    setLoading(true); setError("");
+    const results = await Promise.allSettled([api.students.stats(), api.students.list("limit=1000"), api.attendance.list(), api.fees.invoices.list(), api.fees.payments.list(), api.admissions.list(), api.notices.list()]);
+    const value = (index: number) => results[index].status === "fulfilled" ? results[index].value : {};
+    const failed = results.filter((item) => item.status === "rejected").length;
+    setData({ studentStats: value(0).data || emptyData.studentStats, students: value(1).data || [], attendance: value(2).data || [], invoices: value(3).data || [], payments: value(4).data || [], admissions: value(5).data || [], notices: value(6).data || [] });
+    setError(failed === results.length ? "Live data is unavailable. Showing an empty school overview." : failed > 0 ? "Some dashboard sections are temporarily unavailable." : "");
+    setLoading(false);
+  };
+
+  useEffect(() => { loadDashboard(); }, []);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayAttendance = data.attendance.filter((item) => new Date(item.date).toISOString().slice(0, 10) === today);
+  const presentToday = todayAttendance.filter((item) => item.status === "Present").length;
+  const attendancePercent = todayAttendance.length ? Math.round((presentToday / todayAttendance.length) * 100) : 0;
+  const feesCollected = data.payments.reduce((total, item) => total + Number(item.amount || 0), 0);
+  const feesExpected = data.invoices.reduce((total, item) => total + Number(item.amount || 0), 0);
+  const newEnquiries = data.admissions.filter((item) => item.status === "New").length;
+  const classStrength = useMemo(() => (data.studentStats.byClass || []).slice(0, 5), [data.studentStats.byClass]);
+
+  return <View style={styles.container}>
+    <Topbar title="Dashboard" onMenuClick={() => {}} />
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.hero}><View style={styles.heroCopy}><Text style={styles.heroEyebrow}>{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</Text><Text style={styles.heroTitle}>Good morning, Administrator</Text><Text style={styles.heroSubtitle}>{data.studentStats.total.toLocaleString("en-IN")} students · school operations overview</Text></View><View style={styles.heroMetrics}><View style={styles.heroMetric}><Text style={styles.heroMetricValue}>{attendancePercent}%</Text><Text style={styles.heroMetricLabel}>Attendance</Text></View><View style={styles.heroMetric}><Text style={styles.heroMetricValue}>{newEnquiries}</Text><Text style={styles.heroMetricLabel}>New enquiries</Text></View></View></View>
+      {error ? <TouchableOpacity style={styles.error} onPress={loadDashboard}><Text style={styles.errorText}>{error}</Text><Text style={styles.retry}>Retry</Text></TouchableOpacity> : null}
+      <View style={styles.statsGrid}><StatCard icon={Users} label="Total Students" value={data.studentStats.total.toLocaleString("en-IN")} detail={`${data.studentStats.active.toLocaleString("en-IN")} active students`} tint={colors.amber} /><StatCard icon={CalendarCheck} label="Today's Attendance" value={`${attendancePercent}%`} detail={`${presentToday} present of ${todayAttendance.length} marked`} tint={colors.green} /><StatCard icon={IndianRupee} label="Fees Collected" value={money(feesCollected)} detail={`of ${money(feesExpected)} invoiced`} tint={colors.blue} /><StatCard icon={UserPlus} label="Admission Enquiries" value={String(data.admissions.length)} detail={`${newEnquiries} new enquiries`} tint={colors.red} /></View>
+      <Card title="Attendance today" action="View attendance"><View style={styles.progressRow}><View style={styles.progressTrack}><View style={[styles.progressFill, { width: `${attendancePercent}%` }]} /></View><Text style={styles.progressValue}>{attendancePercent}%</Text></View><View style={styles.legendRow}><Text style={styles.muted}>{presentToday} present</Text><Text style={styles.muted}>{Math.max(0, todayAttendance.length - presentToday)} absent / pending</Text></View></Card>
+      <View style={styles.twoColumn}><Card title="Students by section">{classStrength.length ? classStrength.map((item: any) => { const max = Math.max(...classStrength.map((entry: any) => entry.count || 0), 1); return <View key={item._id} style={styles.barRow}><Text style={styles.barLabel}>{item._id || "Unknown"}</Text><View style={styles.barTrack}><View style={[styles.barFill, { width: `${((item.count || 0) / max) * 100}%` }]} /></View><Text style={styles.barValue}>{item.count || 0}</Text></View>; }) : <Text style={styles.empty}>Section data will appear here.</Text>}</Card><Card title="Fees snapshot"><View style={styles.feeLine}><Text style={styles.muted}>Collected</Text><Text style={[styles.feeValue, { color: colors.green }]}>{money(feesCollected)}</Text></View><View style={styles.feeLine}><Text style={styles.muted}>Outstanding</Text><Text style={[styles.feeValue, { color: colors.red }]}>{money(Math.max(0, feesExpected - feesCollected))}</Text></View><View style={styles.feeRule} /><Text style={styles.muted}>{data.invoices.length} invoices generated</Text></Card></View>
+      <Card title="Recent admissions" action="View all">{data.admissions.slice(0, 4).map((item: any, index: number) => <View key={item._id || index} style={styles.listRow}><View style={[styles.avatar, { backgroundColor: index % 2 ? "#E9F1F8" : "#FFF1D9" }]}><Text style={styles.avatarText}>{String(item.studentName || item.name || "A").charAt(0)}</Text></View><View style={styles.listBody}><Text style={styles.listTitle}>{item.studentName || item.name || "New admission enquiry"}</Text><Text style={styles.muted}>{item.className || item.class || "Application received"}</Text></View><Text style={styles.status}>{item.status || "New"}</Text></View>)}{!data.admissions.length ? <Text style={styles.empty}>No admission enquiries yet.</Text> : null}</Card>
+      <Card title="Notice board" action="Open notices">{data.notices.slice(0, 3).map((item: any, index: number) => <View key={item._id || index} style={styles.noticeRow}><Megaphone size={16} color={colors.amber} /><View style={styles.listBody}><Text style={styles.listTitle} numberOfLines={1}>{item.title || "School announcement"}</Text><Text style={styles.muted} numberOfLines={1}>{item.message || "New notice published for the school community."}</Text></View><ArrowUpRight size={16} color={colors.slate} /></View>)}{!data.notices.length ? <Text style={styles.empty}>No notices published yet.</Text> : null}</Card>
+      {loading ? <ActivityIndicator color={colors.amber} style={styles.loader} /> : null}
+    </ScrollView>
+  </View>;
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.paper }, content: { padding: 16, paddingBottom: 36 }, hero: { backgroundColor: colors.ink, borderRadius: 18, padding: 20, marginBottom: 14, overflow: "hidden" }, heroCopy: { marginBottom: 18 }, heroEyebrow: { color: colors.amber, fontSize: 12, fontWeight: "700", marginBottom: 7 }, heroTitle: { color: "#fff", fontSize: 24, fontWeight: "800", marginBottom: 6 }, heroSubtitle: { color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 19 }, heroMetrics: { flexDirection: "row", gap: 10 }, heroMetric: { backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, minWidth: 112 }, heroMetricValue: { color: "#fff", fontSize: 21, fontWeight: "800" }, heroMetricLabel: { color: "rgba(255,255,255,0.55)", fontSize: 11, marginTop: 3 }, error: { backgroundColor: "#FFF1EF", borderColor: "#F3C2BB", borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 14, flexDirection: "row", justifyContent: "space-between", gap: 10 }, errorText: { color: colors.red, fontSize: 12, flex: 1 }, retry: { color: colors.red, fontWeight: "800", fontSize: 12 }, statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 14 }, statCard: { width: "48.5%", backgroundColor: "#fff", borderRadius: 14, padding: 14, borderColor: colors.border, borderWidth: 1 }, statIcon: { width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center", marginBottom: 10 }, statLabel: { color: colors.slate, fontSize: 12, marginBottom: 4 }, statValue: { color: colors.ink, fontSize: 20, fontWeight: "800" }, statDetail: { color: colors.slate, fontSize: 10.5, marginTop: 4 }, card: { backgroundColor: "#fff", borderRadius: 14, borderColor: colors.border, borderWidth: 1, padding: 16, marginBottom: 14 }, cardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }, cardTitle: { color: colors.ink, fontSize: 15, fontWeight: "800" }, action: { flexDirection: "row", alignItems: "center", gap: 2 }, actionText: { color: colors.blue, fontSize: 11.5, fontWeight: "700" }, progressRow: { flexDirection: "row", alignItems: "center", gap: 12 }, progressTrack: { height: 12, backgroundColor: "#EEF0F3", borderRadius: 6, flex: 1, overflow: "hidden" }, progressFill: { height: "100%", backgroundColor: colors.green, borderRadius: 6 }, progressValue: { color: colors.green, fontSize: 18, fontWeight: "800", width: 50 }, legendRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 9 }, muted: { color: colors.slate, fontSize: 12 }, twoColumn: { gap: 0 }, barRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 }, barLabel: { width: 54, color: colors.slate, fontSize: 11 }, barTrack: { flex: 1, height: 8, backgroundColor: "#F0F1F3", borderRadius: 4, overflow: "hidden" }, barFill: { height: "100%", backgroundColor: colors.amber, borderRadius: 4 }, barValue: { width: 26, textAlign: "right", color: colors.ink, fontSize: 12, fontWeight: "700" }, feeLine: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }, feeValue: { fontSize: 15, fontWeight: "800" }, feeRule: { height: 1, backgroundColor: colors.border, marginBottom: 10 }, listRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#F0F1F3" }, noticeRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#F0F1F3" }, avatar: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center" }, avatarText: { color: colors.ink, fontSize: 13, fontWeight: "800" }, listBody: { flex: 1 }, listTitle: { color: colors.ink, fontSize: 13, fontWeight: "700", marginBottom: 3 }, status: { color: colors.green, backgroundColor: "#EAF6EE", borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4, fontSize: 10, fontWeight: "700" }, empty: { color: colors.slate, fontSize: 12, paddingVertical: 4 }, loader: { marginTop: 2 },
+});
