@@ -16,8 +16,7 @@ export default function PlatformTabsLayout() {
       initialRouteName="schools"
       backBehavior="history"
     >
-
-        <Tabs.Screen
+      <Tabs.Screen
         name="platform"
         options={{
           title: "Platform Management",
@@ -62,7 +61,6 @@ export default function PlatformTabsLayout() {
           ),
         }}
       />
-    
     </Tabs>
   );
 }

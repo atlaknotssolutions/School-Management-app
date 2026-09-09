@@ -11,7 +11,7 @@ export default function DrawerLayout() {
           headerShown: false,
           drawerType: "front",
           drawerStyle: {
-            width: 288,
+            width: 280,
             backgroundColor: "#16213E",
           },
           overlayColor: "rgba(0,0,0,0.4)",

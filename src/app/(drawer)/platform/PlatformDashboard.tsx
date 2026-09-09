@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from "react";
+import { DrawerToggle } from "@/components/PlatformSidebar";
+import { Card, PageIntro, Pill, StatCard } from "@/components/UI";
+import { api } from "@/lib/api";
 import {
-  View,
-  Text,
-  ScrollView,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-import {
-  Building2,
-  Users,
-  Wallet,
-  TrendingUp,
-  AlertTriangle,
   Activity,
+  AlertTriangle,
+  Building2,
   CalendarClock,
   Layers,
+  TrendingUp,
+  Users,
+  Wallet,
 } from "lucide-react-native";
-import { api } from "@/lib/api";
-import { Card, PageIntro, Pill, StatCard } from "@/components/UI";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const PIE_COLORS = ["#16213E", "#E8A33D", "#3F8F5F", "#3B6FA0", "#D65A4A"];
 
@@ -83,6 +84,9 @@ export default function PlatformDashboard() {
   if (loading) {
     return (
       <View style={styles.container}>
+        <View style={styles.toggleRow}>
+          <DrawerToggle />
+        </View>
         <PageIntro eyebrow="Platform Owner" title="Platform Dashboard" />
         <Card>
           <View style={styles.center}>
@@ -97,6 +101,9 @@ export default function PlatformDashboard() {
   if (error || !data) {
     return (
       <View style={styles.container}>
+        <View style={styles.toggleRow}>
+          <DrawerToggle />
+        </View>
         <PageIntro eyebrow="Platform Owner" title="Platform Dashboard" />
         <Card>
           <Text style={styles.errorText}>
@@ -137,6 +144,11 @@ export default function PlatformDashboard() {
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
+      {/* Toggle button – opens custom sidebar */}
+      <View style={styles.toggleRow}>
+        <DrawerToggle />
+      </View>
+
       <PageIntro
         eyebrow="Platform Owner"
         title="Platform Dashboard"
@@ -167,9 +179,7 @@ export default function PlatformDashboard() {
                   styles.alertText,
                   {
                     color:
-                      alert.severity === "warning"
-                        ? colors.alert
-                        : colors.info,
+                      alert.severity === "warning" ? colors.alert : colors.info,
                   },
                 ]}
               >
@@ -226,11 +236,9 @@ export default function PlatformDashboard() {
             label="Revenue"
             value={inr(revenue.collected ?? data.revenue?.collected)}
             sub={`${inr(
-              revenue.outstanding ?? data.revenue?.outstanding
+              revenue.outstanding ?? data.revenue?.outstanding,
             )} outstanding`}
-            accent={
-              Number(revenue.outstanding || 0) > 0 ? "alert" : "success"
-            }
+            accent={Number(revenue.outstanding || 0) > 0 ? "alert" : "success"}
           />
         </View>
       </View>
@@ -287,8 +295,7 @@ export default function PlatformDashboard() {
                       styles.barFill,
                       {
                         width: `${width}%`,
-                        backgroundColor:
-                          PIE_COLORS[index % PIE_COLORS.length],
+                        backgroundColor: PIE_COLORS[index % PIE_COLORS.length],
                       },
                     ]}
                   />
@@ -410,6 +417,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "#F7F5F0",
+  },
+  toggleRow: {
+    alignItems: "flex-start",
+    marginBottom: 12,
   },
   scroll: {
     flex: 1,

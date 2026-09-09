@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -10,8 +11,10 @@ import {
   Alert,
   FlatList,
   Modal,
+  Pressable,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Building2,
   Plus,
@@ -22,6 +25,45 @@ import {
 } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { Card, PageIntro, Pill } from "@/components/UI";
+
+const PLATFORM_MENU = [
+  { label: "Dashboard", href: "/(drawer)/platform", icon: "grid-outline" },
+  {
+    label: "Plans & Pricing",
+    href: "/(drawer)/platform/plans",
+    icon: "pricetag-outline",
+  },
+  {
+    label: "Subscriptions",
+    href: "/(drawer)/platform/subscriptions",
+    icon: "card-outline",
+  },
+  {
+    label: "Reports",
+    href: "/(drawer)/platform/reports",
+    icon: "bar-chart-outline",
+  },
+  {
+    label: "Schools Management",
+    href: "/(drawer)/platform/(tabs)/schools",
+    icon: "school-outline",
+  },
+  {
+    label: "Users & Access",
+    href: "/(drawer)/platform/(tabs)/users",
+    icon: "people-outline",
+  },
+  {
+    label: "Audit Logs",
+    href: "/(drawer)/platform/(tabs)/audit",
+    icon: "document-text-outline",
+  },
+  {
+    label: "Settings",
+    href: "/(drawer)/platform/(tabs)/settings",
+    icon: "settings-outline",
+  },
+];
 
 const colors = {
   ink: "#16213E",
@@ -83,6 +125,7 @@ const ONBOARDING_OPTIONS = [
 
 export default function SchoolsManagement() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [rows, setRows] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -251,6 +294,44 @@ export default function SchoolsManagement() {
 
   return (
     <View style={styles.container}>
+      {/* ===== TOP SIDEBAR MENU (sabse upar) ===== */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.topMenu}
+        contentContainerStyle={styles.topMenuContent}
+      >
+        {PLATFORM_MENU.map((item) => {
+          const isFocused =
+            pathname === item.href ||
+            (item.href === "/(drawer)/platform/(tabs)/schools" &&
+              (pathname?.includes("/schools") ||
+                pathname === "/(drawer)/platform/(tabs)/schools")) ||
+            (item.href === "/(drawer)/platform" &&
+              (pathname === "/(drawer)/platform" ||
+                pathname === "/(drawer)/platform/"));
+
+          return (
+            <Pressable
+              key={item.href}
+              onPress={() => router.push(item.href as any)}
+              style={[styles.menuItem, isFocused && styles.menuItemFocused]}
+            >
+              <Ionicons
+                name={item.icon as any}
+                size={18}
+                color={isFocused ? "#4F46E5" : "#A1A1AA"}
+              />
+              <Text
+                style={[styles.menuLabel, isFocused && styles.menuLabelFocused]}
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -407,6 +488,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.paper,
   },
+  // ===== Top Menu Styles =====
+  topMenu: {
+    backgroundColor: "#16213E",
+    maxHeight: 56,
+  },
+  topMenuContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    alignItems: "center",
+    gap: 6,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginRight: 4,
+    gap: 8,
+  },
+  menuItemFocused: {
+    backgroundColor: "rgba(79, 70, 229, 0.15)",
+  },
+  menuLabel: {
+    color: "#A1A1AA",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  menuLabelFocused: {
+    color: "#4F46E5",
+    fontWeight: "600",
+  },
+  // ===== Rest of styles =====
   content: {
     padding: 16,
     paddingBottom: 40,

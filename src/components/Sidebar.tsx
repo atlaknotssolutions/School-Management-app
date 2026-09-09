@@ -1,12 +1,9 @@
-
-
 import { Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PLATFORM_MENU = [
-  { label: "Dashboard", href: "/(drawer)/platform", icon: "grid-outline" },
   {
     label: "Plans & Pricing",
     href: "/(drawer)/platform/plans",
@@ -21,26 +18,6 @@ const PLATFORM_MENU = [
     label: "Reports",
     href: "/(drawer)/platform/reports",
     icon: "bar-chart-outline",
-  },
-  {
-    label: "Schools Management",
-    href: "/(drawer)/platform/(tabs)/schools",
-    icon: "school-outline",
-  },
-  {
-    label: "Users & Access",
-    href: "/(drawer)/platform/(tabs)/users",
-    icon: "people-outline",
-  },
-  {
-    label: "Audit Logs",
-    href: "/(drawer)/platform/(tabs)/audit",
-    icon: "document-text-outline",
-  },
-  {
-    label: "Settings",
-    href: "/(drawer)/platform/(tabs)/settings",
-    icon: "settings-outline",
   },
 ];
 
@@ -68,11 +45,7 @@ export default function Sidebar({ navigation }: SidebarProps) {
       </View>
 
       {PLATFORM_MENU.map((item) => {
-        const isFocused =
-          pathname === item.href ||
-          (item.href === "/(drawer)/platform" &&
-            (pathname === "/(drawer)/platform" ||
-              pathname === "/(drawer)/platform/"));
+        const isFocused = pathname === item.href;
 
         return (
           <Pressable
