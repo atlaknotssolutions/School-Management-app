@@ -1,20 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PLATFORM_TABS = [
   {
-    label: "Schools",
+    label: "School Management",
     href: "/(drawer)/platform/(tabs)/schools",
     icon: "school-outline",
   },
   {
-    label: "Users",
+    label: "Users & Access",
     href: "/(drawer)/platform/(tabs)/users",
     icon: "people-outline",
   },
   {
-    label: "Audit",
+    label: "Audit Logs",
     href: "/(drawer)/platform/(tabs)/audit",
     icon: "document-text-outline",
   },
@@ -28,9 +29,10 @@ const PLATFORM_TABS = [
 export function PlatformTabBar() {
   const pathname = usePathname();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.bar}>
+    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 6) }]}>
       {PLATFORM_TABS.map((tab) => {
         const active = pathname?.includes(tab.href.split("/").pop() || "");
 
@@ -43,9 +45,12 @@ export function PlatformTabBar() {
             <Ionicons
               name={tab.icon}
               size={18}
-              color={active ? "#E8A33D" : "#A1A1AA"}
+              color={active ? "#4F46E5" : "#A1A1AA"}
             />
-            <Text style={[styles.label, active && styles.activeLabel]}>
+            <Text
+              style={[styles.label, active && styles.activeLabel]}
+              numberOfLines={1}
+            >
               {tab.label}
             </Text>
           </Pressable>
@@ -63,6 +68,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#2A2A4A",
     paddingHorizontal: 8,
     paddingVertical: 6,
+    minHeight: 62,
   },
   tab: {
     flex: 1,
@@ -73,14 +79,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeTab: {
-    backgroundColor: "rgba(232,163,61,0.14)",
+    backgroundColor: "rgba(79,70,229,0.15)",
   },
   label: {
     color: "#A1A1AA",
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: "600",
+    textAlign: "center",
   },
   activeLabel: {
-    color: "#E8A33D",
+    color: "#4F46E5",
   },
 });
