@@ -116,7 +116,7 @@ export default function LoginScreen() {
         dispatch(setCredentials(data));
 
         router.replace(
-          (data.user?.role === "super_admin" ? "/(tabs)/platform" : "/") as any,
+          (data.user?.role === "super_admin" ? "platform/(tabs)" : "/") as any,
         );
       }
     } catch (requestError: any) {

@@ -6,7 +6,7 @@ import { clearAuthStorage, logout, setTokens } from "../store/authSlice";
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiUrl ||
   process.env.EXPO_PUBLIC_API_URL ||
-  "http://172.19.130.82:5000/api";
+  "http://192.168.1.23:5000/api";
 
 const json = (method: string, body?: any) => ({
   method,
