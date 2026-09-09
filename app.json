@@ -4,7 +4,7 @@
     "slug": "School Management",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/stress_free_school.png",
     "scheme": "School Management",
     "userInterfaceStyle": "automatic",
     "ios": {
