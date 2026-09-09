@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Modal,
-  Dimensions,
-  ScrollView,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
+import React, { createContext, useContext, useState } from "react";
+import {
+  Dimensions,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -32,21 +32,7 @@ const PLATFORM_MENU = [
     href: "/(drawer)/platform/reports",
     icon: "bar-chart-outline",
   },
-  {
-    label: "Schools Management",
-    href: "/(drawer)/platform/(tabs)/schools",
-    icon: "school-outline",
-  },
-  {
-    label: "Users & Access",
-    href: "/(drawer)/platform/(tabs)/users",
-    icon: "people-outline",
-  },
-  {
-    label: "Audit Logs",
-    href: "/(drawer)/platform/(tabs)/audit",
-    icon: "document-text-outline",
-  },
+  
   {
     label: "Settings",
     href: "/(drawer)/platform/(tabs)/settings",
@@ -67,12 +53,18 @@ const SidebarContext = createContext<SidebarContextType | null>(null);
 export function usePlatformSidebar() {
   const ctx = useContext(SidebarContext);
   if (!ctx) {
-    throw new Error("usePlatformSidebar must be used inside PlatformSidebarProvider");
+    throw new Error(
+      "usePlatformSidebar must be used inside PlatformSidebarProvider",
+    );
   }
   return ctx;
 }
 
-export function PlatformSidebarProvider({ children }: { children: React.ReactNode }) {
+export function PlatformSidebarProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -109,7 +101,12 @@ function PlatformSidebar() {
         <Pressable style={styles.backdrop} onPress={closeSidebar} />
 
         {/* Sidebar panel */}
-        <View style={[styles.sidebar, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 }]}>
+        <View
+          style={[
+            styles.sidebar,
+            { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 12 },
+          ]}
+        >
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Platform</Text>
             <Pressable onPress={closeSidebar} hitSlop={12}>
@@ -122,8 +119,10 @@ function PlatformSidebar() {
               const isFocused =
                 pathname === item.href ||
                 (item.href === "/(drawer)/platform" &&
-                  (pathname === "/(drawer)/platform" || pathname === "/(drawer)/platform/")) ||
-                (item.href.includes("/schools") && pathname?.includes("/schools"));
+                  (pathname === "/(drawer)/platform" ||
+                    pathname === "/(drawer)/platform/")) ||
+                (item.href.includes("/schools") &&
+                  pathname?.includes("/schools"));
 
               return (
                 <Pressable
@@ -140,7 +139,9 @@ function PlatformSidebar() {
                     color={isFocused ? "#4F46E5" : "#A1A1AA"}
                     style={styles.icon}
                   />
-                  <Text style={[styles.label, isFocused && styles.labelFocused]}>
+                  <Text
+                    style={[styles.label, isFocused && styles.labelFocused]}
+                  >
                     {item.label}
                   </Text>
                 </Pressable>
@@ -163,14 +164,14 @@ export function DrawerToggle({
   color?: string;
   backgroundColor?: string;
 }) {
-  const { openSidebar } = usePlatformSidebar();
+  const { open, toggleSidebar } = usePlatformSidebar();
 
   return (
     <Pressable
-      onPress={openSidebar}
+      onPress={toggleSidebar}
       style={[styles.toggleBtn, { backgroundColor }]}
     >
-      <Ionicons name="menu" size={size} color={color} />
+      <Ionicons name={open ? "close" : "menu"} size={size} color={color} />
     </Pressable>
   );
 }

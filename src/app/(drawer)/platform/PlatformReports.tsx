@@ -1,28 +1,27 @@
-import React, { useEffect, useState, useMemo } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  StyleSheet,
-  FlatList,
-  Alert,
-  Share,
-  Platform,
-} from "react-native";
-import {
-  Download,
-  FileBarChart,
-  CalendarDays,
-  ArrowDown,
-  ArrowUp,
-} from "lucide-react-native";
+import { DrawerToggle } from "@/components/PlatformSidebar";
+import { PlatformTabBar } from "@/components/PlatformTabBar";
+import { Card, PageIntro } from "@/components/UI";
 import { api } from "@/lib/api";
-import { Card, PageIntro, Button } from "@/components/UI";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
+import {
+  ArrowDown,
+  ArrowUp,
+  CalendarDays,
+  Download,
+  FileBarChart,
+} from "lucide-react-native";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const colors = {
   ink: "#16213E",
@@ -118,7 +117,7 @@ export default function PlatformReports() {
     try {
       const { data } = await api.platform.reports.generate(
         nextType,
-        params.toString()
+        params.toString(),
       );
       setReport(data);
       setSortKey("");
@@ -137,8 +136,10 @@ export default function PlatformReports() {
       const needle = query.trim().toLowerCase();
       result = result.filter((row) =>
         Object.values(row).some((v) =>
-          String(v ?? "").toLowerCase().includes(needle)
-        )
+          String(v ?? "")
+            .toLowerCase()
+            .includes(needle),
+        ),
       );
     }
 
@@ -203,260 +204,278 @@ export default function PlatformReports() {
     catalog.find((c) => c.id === type)?.title || "Select report";
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      <PageIntro
-        eyebrow="Platform Owner · Insights"
-        title="Reports"
-        description="Generate reports on demand from live platform data. No fabricated figures — every row comes from schools, users, subscriptions or invoices."
-      />
+    <View style={styles.container}>
+      <View style={styles.toggleRow}>
+        <DrawerToggle />
+      </View>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <PageIntro
+          eyebrow="Platform Owner · Insights"
+          title="Reports"
+          description="Generate reports on demand from live platform data. No fabricated figures — every row comes from schools, users, subscriptions or invoices."
+        />
 
-      {/* Catalog */}
-      <Card title="Report catalog" style={styles.mb4} bodyStyle={{ padding: 8 }}>
-        {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator color={colors.amber} />
-            <Text style={styles.muted}>Loading catalog…</Text>
-          </View>
-        ) : (
-          <View>
-            {catalog.map((item) => {
-              const active = type === item.id;
-              return (
+        {/* Catalog */}
+        <Card
+          title="Report catalog"
+          style={styles.mb4}
+          bodyStyle={{ padding: 8 }}
+        >
+          {loading ? (
+            <View style={styles.center}>
+              <ActivityIndicator color={colors.amber} />
+              <Text style={styles.muted}>Loading catalog…</Text>
+            </View>
+          ) : (
+            <View>
+              {catalog.map((item) => {
+                const active = type === item.id;
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() => {
+                      setType(item.id);
+                      setReport(null);
+                    }}
+                    style={[
+                      styles.catalogItem,
+                      active && styles.catalogItemActive,
+                    ]}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.catalogRow}>
+                      <FileBarChart
+                        size={14}
+                        color={
+                          active ? colors.amberDark : "rgba(71,84,103,0.6)"
+                        }
+                      />
+                      <Text
+                        style={[
+                          styles.catalogTitle,
+                          active && { color: colors.ink },
+                        ]}
+                      >
+                        {item.title}
+                      </Text>
+                    </View>
+                    {item.category ? (
+                      <Text style={styles.catalogCat}>{item.category}</Text>
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </Card>
+
+        {/* Generate */}
+        <Card title="Generate" style={styles.mb4}>
+          {/* Type selector */}
+          <Text style={styles.label}>Report type</Text>
+          <TouchableOpacity
+            style={styles.selectBtn}
+            onPress={() => setOpenCatalog(!openCatalog)}
+          >
+            <Text style={styles.selectText}>{selectedTitle}</Text>
+          </TouchableOpacity>
+          {openCatalog && (
+            <View style={styles.dropdown}>
+              {catalog.map((item) => (
                 <TouchableOpacity
                   key={item.id}
+                  style={styles.dropdownItem}
                   onPress={() => {
                     setType(item.id);
                     setReport(null);
-                  }}
-                  style={[styles.catalogItem, active && styles.catalogItemActive]}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.catalogRow}>
-                    <FileBarChart
-                      size={14}
-                      color={active ? colors.amberDark : "rgba(71,84,103,0.6)"}
-                    />
-                    <Text
-                      style={[
-                        styles.catalogTitle,
-                        active && { color: colors.ink },
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-                  </View>
-                  {item.category ? (
-                    <Text style={styles.catalogCat}>{item.category}</Text>
-                  ) : null}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </Card>
-
-      {/* Generate */}
-      <Card title="Generate" style={styles.mb4}>
-        {/* Type selector */}
-        <Text style={styles.label}>Report type</Text>
-        <TouchableOpacity
-          style={styles.selectBtn}
-          onPress={() => setOpenCatalog(!openCatalog)}
-        >
-          <Text style={styles.selectText}>{selectedTitle}</Text>
-        </TouchableOpacity>
-        {openCatalog && (
-          <View style={styles.dropdown}>
-            {catalog.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.dropdownItem}
-                onPress={() => {
-                  setType(item.id);
-                  setReport(null);
-                  setOpenCatalog(false);
-                }}
-              >
-                <Text style={styles.dropdownText}>{item.title}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
-        {/* Date range */}
-        <View style={styles.dateRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>From (YYYY-MM-DD)</Text>
-            <TextInput
-              style={styles.input}
-              value={from}
-              onChangeText={setFrom}
-              placeholder="2025-01-01"
-              placeholderTextColor="rgba(71,84,103,0.45)"
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>To (YYYY-MM-DD)</Text>
-            <TextInput
-              style={styles.input}
-              value={to}
-              onChangeText={setTo}
-              placeholder="2025-12-31"
-              placeholderTextColor="rgba(71,84,103,0.45)"
-            />
-          </View>
-        </View>
-
-        {/* Actions */}
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[
-              styles.genBtn,
-              (generating || !type) && { opacity: 0.6 },
-            ]}
-            onPress={() => run()}
-            disabled={generating || !type}
-            activeOpacity={0.8}
-          >
-            {generating ? (
-              <ActivityIndicator color={colors.ink} size="small" />
-            ) : (
-              <CalendarDays size={15} color={colors.ink} />
-            )}
-            <Text style={styles.genBtnText}>
-              {generating ? "Generating…" : "Generate"}
-            </Text>
-          </TouchableOpacity>
-
-          {report ? (
-            <TouchableOpacity
-              style={styles.csvBtn}
-              onPress={download}
-              activeOpacity={0.8}
-            >
-              <Download size={15} color={colors.ink} />
-              <Text style={styles.csvBtnText}>CSV</Text>
-            </TouchableOpacity>
-          ) : null}
-        </View>
-
-        {report?.meta ? (
-          <Text style={styles.metaText}>
-            {report.meta.title} · {report.meta.rowCount} rows · generated{" "}
-            {report.meta.generatedAt
-              ? new Date(report.meta.generatedAt).toLocaleString("en-IN")
-              : "—"}
-          </Text>
-        ) : null}
-      </Card>
-
-      {/* Results */}
-      {report ? (
-        <Card>
-          {/* Filter + limit */}
-          <View style={styles.resultTools}>
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              placeholder="Filter rows…"
-              placeholderTextColor="rgba(71,84,103,0.45)"
-              value={query}
-              onChangeText={setQuery}
-            />
-
-            <TouchableOpacity
-              style={[styles.selectBtn, { width: 100 }]}
-              onPress={() => setOpenMaxRows(!openMaxRows)}
-            >
-              <Text style={styles.selectText}>{maxRows} rows</Text>
-            </TouchableOpacity>
-          </View>
-
-          {openMaxRows && (
-            <View style={[styles.dropdown, { marginBottom: 12 }]}>
-              {[50, 100, 500, 100000].map((n) => (
-                <TouchableOpacity
-                  key={n}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setMaxRows(n);
-                    setOpenMaxRows(false);
+                    setOpenCatalog(false);
                   }}
                 >
-                  <Text style={styles.dropdownText}>
-                    {n === 100000 ? "All" : `${n} rows`}
-                  </Text>
+                  <Text style={styles.dropdownText}>{item.title}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           )}
 
-          <Text style={styles.showing}>
-            showing {limitedRows.length} of {rows.length}
-          </Text>
+          {/* Date range */}
+          <View style={styles.dateRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>From (YYYY-MM-DD)</Text>
+              <TextInput
+                style={styles.input}
+                value={from}
+                onChangeText={setFrom}
+                placeholder="2025-01-01"
+                placeholderTextColor="rgba(71,84,103,0.45)"
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>To (YYYY-MM-DD)</Text>
+              <TextInput
+                style={styles.input}
+                value={to}
+                onChangeText={setTo}
+                placeholder="2025-12-31"
+                placeholderTextColor="rgba(71,84,103,0.45)"
+              />
+            </View>
+          </View>
 
-          {limitedRows.length === 0 ? (
-            <Text style={[styles.muted, { textAlign: "center", paddingVertical: 24 }]}>
-              No rows to display.
+          {/* Actions */}
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={[styles.genBtn, (generating || !type) && { opacity: 0.6 }]}
+              onPress={() => run()}
+              disabled={generating || !type}
+              activeOpacity={0.8}
+            >
+              {generating ? (
+                <ActivityIndicator color={colors.ink} size="small" />
+              ) : (
+                <CalendarDays size={15} color={colors.ink} />
+              )}
+              <Text style={styles.genBtnText}>
+                {generating ? "Generating…" : "Generate"}
+              </Text>
+            </TouchableOpacity>
+
+            {report ? (
+              <TouchableOpacity
+                style={styles.csvBtn}
+                onPress={download}
+                activeOpacity={0.8}
+              >
+                <Download size={15} color={colors.ink} />
+                <Text style={styles.csvBtnText}>CSV</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
+          {report?.meta ? (
+            <Text style={styles.metaText}>
+              {report.meta.title} · {report.meta.rowCount} rows · generated{" "}
+              {report.meta.generatedAt
+                ? new Date(report.meta.generatedAt).toLocaleString("en-IN")
+                : "—"}
             </Text>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator>
-              <View>
-                {/* Header */}
-                <View style={styles.tableHeader}>
-                  {columns.map((column) => (
-                    <TouchableOpacity
-                      key={column}
-                      style={styles.th}
-                      onPress={() => toggleSort(column)}
-                    >
-                      <Text style={styles.thText}>{column}</Text>
-                      {sortKey === column ? (
-                        sortDir === 1 ? (
-                          <ArrowDown size={11} color={colors.slate} />
-                        ) : (
-                          <ArrowUp size={11} color={colors.slate} />
-                        )
-                      ) : null}
-                    </TouchableOpacity>
-                  ))}
-                </View>
+          ) : null}
+        </Card>
 
-                {/* Rows */}
-                {limitedRows.map((row, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.tableRow,
-                      index % 2 === 1 && { backgroundColor: "rgba(247,245,240,0.5)" },
-                    ]}
+        {/* Results */}
+        {report ? (
+          <Card>
+            {/* Filter + limit */}
+            <View style={styles.resultTools}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Filter rows…"
+                placeholderTextColor="rgba(71,84,103,0.45)"
+                value={query}
+                onChangeText={setQuery}
+              />
+
+              <TouchableOpacity
+                style={[styles.selectBtn, { width: 100 }]}
+                onPress={() => setOpenMaxRows(!openMaxRows)}
+              >
+                <Text style={styles.selectText}>{maxRows} rows</Text>
+              </TouchableOpacity>
+            </View>
+
+            {openMaxRows && (
+              <View style={[styles.dropdown, { marginBottom: 12 }]}>
+                {[50, 100, 500, 100000].map((n) => (
+                  <TouchableOpacity
+                    key={n}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setMaxRows(n);
+                      setOpenMaxRows(false);
+                    }}
                   >
-                    {columns.map((column) => (
-                      <View key={column} style={styles.td}>
-                        <Text style={styles.tdText} numberOfLines={2}>
-                          {fmtValue(row[column])}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
+                    <Text style={styles.dropdownText}>
+                      {n === 100000 ? "All" : `${n} rows`}
+                    </Text>
+                  </TouchableOpacity>
                 ))}
               </View>
-            </ScrollView>
-          )}
-        </Card>
-      ) : (
-        <Card>
-          <Text style={styles.muted}>
-            Choose a report from the catalog and press Generate. Results appear
-            here and can be exported to CSV.
-          </Text>
-        </Card>
-      )}
-    </ScrollView>
+            )}
+
+            <Text style={styles.showing}>
+              showing {limitedRows.length} of {rows.length}
+            </Text>
+
+            {limitedRows.length === 0 ? (
+              <Text
+                style={[
+                  styles.muted,
+                  { textAlign: "center", paddingVertical: 24 },
+                ]}
+              >
+                No rows to display.
+              </Text>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator>
+                <View>
+                  {/* Header */}
+                  <View style={styles.tableHeader}>
+                    {columns.map((column) => (
+                      <TouchableOpacity
+                        key={column}
+                        style={styles.th}
+                        onPress={() => toggleSort(column)}
+                      >
+                        <Text style={styles.thText}>{column}</Text>
+                        {sortKey === column ? (
+                          sortDir === 1 ? (
+                            <ArrowDown size={11} color={colors.slate} />
+                          ) : (
+                            <ArrowUp size={11} color={colors.slate} />
+                          )
+                        ) : null}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  {/* Rows */}
+                  {limitedRows.map((row, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.tableRow,
+                        index % 2 === 1 && {
+                          backgroundColor: "rgba(247,245,240,0.5)",
+                        },
+                      ]}
+                    >
+                      {columns.map((column) => (
+                        <View key={column} style={styles.td}>
+                          <Text style={styles.tdText} numberOfLines={2}>
+                            {fmtValue(row[column])}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+          </Card>
+        ) : (
+          <Card>
+            <Text style={styles.muted}>
+              Choose a report from the catalog and press Generate. Results
+              appear here and can be exported to CSV.
+            </Text>
+          </Card>
+        )}
+      </ScrollView>
+      <PlatformTabBar />
+    </View>
   );
 }
 
@@ -464,6 +483,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.paper,
+  },
+  toggleRow: {
+    backgroundColor: "#16213E",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    alignItems: "flex-start",
   },
   content: {
     padding: 16,

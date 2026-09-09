@@ -84,6 +84,8 @@ export default function PlatformDashboard() {
 
   if (loading) {
     return (
+
+      
       <View style={styles.container}>
         <PageIntro eyebrow="Platform Owner" title="Platform Dashboard" />
         <Card>
