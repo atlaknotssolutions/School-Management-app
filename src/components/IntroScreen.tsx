@@ -16,6 +16,7 @@ export default function IntroScreen() {
   const router = useRouter();
   const player = useVideoPlayer(INTRO_VIDEO, (videoPlayer) => {
     videoPlayer.loop = false;
+    videoPlayer.muted = true;   // ← video muted
     videoPlayer.play();
   });
 
