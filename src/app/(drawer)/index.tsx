@@ -1,4 +1,4 @@
-import PlatformDashboard from "@/screens/PlatformDashboard";
+import PlatformDashboard from "./platform/PlatformDashboard";
 
 export default function DrawerDashboard() {
   return <PlatformDashboard />;

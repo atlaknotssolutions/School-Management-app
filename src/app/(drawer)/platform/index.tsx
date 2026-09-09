@@ -1,3 +1,3 @@
-import PlatformDashboard from "@/screens/PlatformDashboard";
+import PlatformDashboard from "./PlatformDashboard";
 
 export default PlatformDashboard;
