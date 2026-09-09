@@ -561,7 +561,6 @@
 //   },
 // });
 
-
 import { useRouter } from "expo-router";
 import {
   ArrowRight,
@@ -1000,12 +999,12 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 60 : 40,
     paddingBottom: 32,
     paddingHorizontal: 24,
-    alignItems: "center",          // Center everything
+    alignItems: "center", // Center everything
   },
   logoRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",      // Middle mein
+    justifyContent: "center", // Middle mein
     gap: 14,
   },
   logoBox: {
@@ -1035,8 +1034,10 @@ const styles = StyleSheet.create({
   },
   // Form Card
   formCard: {
-    marginHorizontal: 20,
-    marginTop: -20,                 // Thoda overlap for modern look
+    width: "90%",
+    maxWidth: 480,
+    alignSelf: "center",
+    marginTop: -20, // Thoda overlap for modern look
     backgroundColor: "#ffffff",
     borderRadius: 20,
     paddingHorizontal: 22,
@@ -1063,17 +1064,20 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#b8860b",
     marginBottom: 6,
+    textAlign: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
     color: "#1a1a1a",
     marginBottom: 4,
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
     color: "#64748b",
     marginBottom: 24,
+    textAlign: "center",
   },
   field: {
     marginBottom: 16,
