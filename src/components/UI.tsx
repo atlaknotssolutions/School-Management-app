@@ -290,18 +290,16 @@
 //   );
 // }
 
+import { LucideIcon } from "lucide-react-native";
 import React from "react";
 import {
-  View,
+  Image,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  Image,
-  TextInput,
-  StyleSheet,
+  View,
   ViewStyle,
-  TextStyle,
 } from "react-native";
-import { LucideIcon } from "lucide-react-native";
 
 // Colors
 const colors = {
@@ -334,10 +332,26 @@ export function StatCard({
   accent = "amber",
 }: StatCardProps) {
   const accentMap = {
-    amber: { border: colors.amber, bg: "rgba(232,163,61,0.1)", iconBg: "rgba(232,163,61,0.15)" },
-    success: { border: colors.success, bg: "rgba(63,143,95,0.1)", iconBg: "rgba(63,143,95,0.15)" },
-    info: { border: colors.info, bg: "rgba(59,111,160,0.1)", iconBg: "rgba(59,111,160,0.15)" },
-    alert: { border: colors.alert, bg: "rgba(214,90,74,0.1)", iconBg: "rgba(214,90,74,0.15)" },
+    amber: {
+      border: colors.amber,
+      bg: "rgba(232,163,61,0.1)",
+      iconBg: "rgba(232,163,61,0.15)",
+    },
+    success: {
+      border: colors.success,
+      bg: "rgba(63,143,95,0.1)",
+      iconBg: "rgba(63,143,95,0.15)",
+    },
+    info: {
+      border: colors.info,
+      bg: "rgba(59,111,160,0.1)",
+      iconBg: "rgba(59,111,160,0.15)",
+    },
+    alert: {
+      border: colors.alert,
+      bg: "rgba(214,90,74,0.1)",
+      iconBg: "rgba(214,90,74,0.15)",
+    },
   };
   const a = accentMap[accent];
 
@@ -413,13 +427,20 @@ type PageIntroProps = {
   right?: React.ReactNode;
 };
 
-export function PageIntro({ eyebrow, title, description, right }: PageIntroProps) {
+export function PageIntro({
+  eyebrow,
+  title,
+  description,
+  right,
+}: PageIntroProps) {
   return (
     <View style={styles.pageIntro}>
       <View style={{ flex: 1 }}>
         {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
         <Text style={styles.pageTitle}>{title}</Text>
-        {description ? <Text style={styles.pageDesc}>{description}</Text> : null}
+        {description ? (
+          <Text style={styles.pageDesc}>{description}</Text>
+        ) : null}
       </View>
       {right}
     </View>
@@ -484,7 +505,10 @@ export function Button({
   disabled,
   style,
 }: ButtonProps) {
-  const variants = {
+  const variants: Record<
+    NonNullable<ButtonProps["variant"]>,
+    { bg: string; text: string; border?: boolean }
+  > = {
     primary: { bg: colors.ink, text: "#fff" },
     amber: { bg: colors.amber, text: colors.ink },
     outline: { bg: "#fff", text: colors.ink, border: true },

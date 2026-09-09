@@ -17,15 +17,6 @@ export default function PlatformTabsLayout() {
       backBehavior="history"
     >
       <Tabs.Screen
-        name="platform"
-        options={{
-          title: "Platform Management",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="school-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="schools"
         options={{
           title: "School Management",

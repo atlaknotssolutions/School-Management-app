@@ -99,6 +99,15 @@ export const api = {
   register: (payload: any) => request("/auth/register", json("POST", payload)),
   me: () => request("/auth/me"),
 
+  notifications: {
+    list: (params = "") =>
+      request(`/notifications${params ? `?${params}` : ""}`),
+    unreadCount: () => request("/notifications/unread-count"),
+    markAllRead: () => request("/notifications/read-all", json("PATCH")),
+    markRead: (id: string) =>
+      request(`/notifications/${id}/read`, json("PATCH")),
+  },
+
   users: {
     list: (schoolId?: string) =>
       request(`/auth/users${schoolId ? `?schoolId=${schoolId}` : ""}`),

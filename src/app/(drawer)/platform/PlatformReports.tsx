@@ -2,7 +2,7 @@ import { DrawerToggle } from "@/components/PlatformSidebar";
 import { PlatformTabBar } from "@/components/PlatformTabBar";
 import { Card, PageIntro } from "@/components/UI";
 import { api } from "@/lib/api";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import {
   ArrowDown,

@@ -4,11 +4,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const PLATFORM_TABS = [
   {
-    label: "Platform",
-    href: "/(drawer)/platform/(tabs)/platform",
-    icon: "grid-outline",
-  },
-  {
     label: "Schools",
     href: "/(drawer)/platform/(tabs)/schools",
     icon: "school-outline",

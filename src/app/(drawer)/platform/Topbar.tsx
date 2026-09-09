@@ -2,14 +2,7 @@ import { api } from "@/lib/api";
 import { logout } from "@/store/authSlice";
 import { selectRole, selectUser } from "@/store/selectors";
 import { useRouter } from "expo-router";
-import {
-  Bell,
-  CheckCheck,
-  Inbox,
-  LogOut,
-  Menu,
-  Search,
-} from "lucide-react-native";
+import { Bell, CheckCheck, Inbox, LogOut, Menu } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
@@ -19,7 +12,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -37,7 +29,7 @@ const colors = {
   white: "#FFFFFF",
 };
 
-const roleLabel = (role?: string, designation?: string) => {
+const roleLabel = (role?: string | null, designation?: string) => {
   if (role === "super_admin") return "Platform Owner";
   if (role === "school_admin" || role === "admin") return "School Admin";
   if (role === "class_teacher" || role === "teacher") return "Class Teacher";
