@@ -1,5 +1,3 @@
-
-
 // import { DrawerToggle } from "@/components/PlatformSidebar";
 // import { Card, PageIntro, Pill } from "@/components/UI";
 // import { api } from "@/lib/api";
@@ -805,8 +803,8 @@
 //   },
 // });
 
-
 import { DrawerToggle } from "@/components/PlatformSidebar";
+import { PlatformTabBar } from "@/components/PlatformTabBar";
 import { Card, PageIntro, Pill } from "@/components/UI";
 import { api } from "@/lib/api";
 import { logout } from "@/store/authSlice"; // adjust path
@@ -1466,6 +1464,8 @@ export default function SchoolsManagement() {
           )}
         </Card>
       </ScrollView>
+
+      <PlatformTabBar />
 
       {/* Reason Modal */}
       <Modal visible={!!reasonModal} transparent animationType="fade">

@@ -1326,6 +1326,7 @@
 // });
 
 import { DrawerToggle } from "@/components/PlatformSidebar";
+import { PlatformTabBar } from "@/components/PlatformTabBar";
 import { Card, PageIntro, Pill } from "@/components/UI";
 import { api } from "@/lib/api";
 import { logout } from "@/store/authSlice"; // adjust path
@@ -2354,6 +2355,8 @@ export default function PlatformUsers() {
           )}
         </Card>
       </ScrollView>
+
+      <PlatformTabBar />
 
       {/* Credential Modal */}
       <Modal visible={!!createdCredential} transparent animationType="fade">

@@ -44,8 +44,8 @@ export function PlatformTabBar() {
           >
             <Ionicons
               name={tab.icon}
-              size={18}
-              color={active ? "#4F46E5" : "#A1A1AA"}
+              size={19}
+              color={active ? "#E8A33D" : "#AAB2C0"}
             />
             <Text
               style={[styles.label, active && styles.activeLabel]}
@@ -65,29 +65,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#16213E",
     borderTopWidth: 1,
-    borderTopColor: "#2A2A4A",
+    borderTopColor: "rgba(232,163,61,0.22)",
     paddingHorizontal: 8,
-    paddingVertical: 6,
-    minHeight: 62,
+    paddingTop: 7,
+    minHeight: 68,
   },
   tab: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 3,
-    paddingVertical: 6,
-    borderRadius: 8,
+    gap: 4,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
   activeTab: {
-    backgroundColor: "rgba(79,70,229,0.15)",
+    backgroundColor: "rgba(232,163,61,0.16)",
   },
   label: {
-    color: "#A1A1AA",
-    fontSize: 10.5,
+    color: "#AAB2C0",
+    fontSize: 10,
     fontWeight: "600",
+    letterSpacing: 0.1,
     textAlign: "center",
   },
   activeLabel: {
-    color: "#4F46E5",
+    color: "#E8A33D",
   },
 });

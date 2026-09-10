@@ -1,5 +1,5 @@
-
 import { DrawerToggle } from "@/components/PlatformSidebar";
+import { PlatformTabBar } from "@/components/PlatformTabBar";
 import { Card, PageIntro } from "@/components/UI";
 import { api } from "@/lib/api";
 import { logout } from "@/store/authSlice"; // adjust path
@@ -579,6 +579,7 @@ export default function PlatformSettings() {
           </View>
         )}
       </ScrollView>
+      <PlatformTabBar />
     </View>
   );
 }
