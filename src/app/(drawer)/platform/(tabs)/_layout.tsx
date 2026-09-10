@@ -1,7 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 
 export default function PlatformTabsLayout() {
+  const pathname = usePathname();
+  const isAuditRoute = pathname?.endsWith("/audit");
+
   return (
     <Tabs
       screenOptions={{
@@ -11,6 +14,7 @@ export default function PlatformTabsLayout() {
         tabBarStyle: {
           backgroundColor: "#16213E",
           borderTopColor: "#2A2A4A",
+          display: isAuditRoute ? "none" : "flex",
         },
       }}
       initialRouteName="schools"
