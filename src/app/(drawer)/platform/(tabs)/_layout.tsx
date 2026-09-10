@@ -6,6 +6,10 @@ export default function PlatformTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        sceneStyle: {
+          paddingTop: 10,
+          backgroundColor: "#F7F5F0",
+        },
         tabBarActiveTintColor: "#E8A33D",
         tabBarInactiveTintColor: "#AAB2C0",
         tabBarLabelStyle: {
